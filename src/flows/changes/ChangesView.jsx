@@ -1,20 +1,60 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from '../../store/AppStore'
 import ChangedList from './ChangedList'
 import ComponentDetail from './ComponentDetail'
 import styles from './ChangesView.module.css'
 
 export default function ChangesView() {
-  const { changes, users } = useStore()
+  const { changes, users, sendIntentNote, discardIntentNote } = useStore()
   const [selectedId, setSelectedId] = useState(changes[0].id)
-  // Each change tracks its own intent-note state (Sprint 1: manual click-through).
+
+  // Transient interaction state per change ('empty' | 'ready' | 'recording' | 'playback').
+  // The 'sent' state is sourced from the store once a note is attached.
   const [stateById, setStateById] = useState({})
+  const [durationById, setDurationById] = useState({})
+  const [recSeconds, setRecSeconds] = useState(0)
 
   const selected = changes.find((c) => c.id === selectedId)
-  const intentState = stateById[selectedId] ?? 'empty'
+  const isSent = selected.intentNote?.status === 'sent'
+  const transient = stateById[selectedId] ?? 'empty'
+  const intentState = isSent ? 'sent' : transient
 
-  function setIntentState(next) {
+  const duration = isSent
+    ? selected.intentNote.durationSec
+    : durationById[selectedId] ?? 0
+
+  // Live recording timer.
+  useEffect(() => {
+    if (intentState !== 'recording') return
+    const id = setInterval(() => setRecSeconds((s) => s + 1), 1000)
+    return () => clearInterval(id)
+  }, [intentState, selectedId])
+
+  function setTransient(next) {
     setStateById((prev) => ({ ...prev, [selectedId]: next }))
+  }
+
+  function handleIntentChange(next) {
+    if (next === 'recording') setRecSeconds(0)
+    if (next === 'playback') {
+      setDurationById((prev) => ({ ...prev, [selectedId]: recSeconds }))
+    }
+    if (next === 'empty') {
+      setDurationById((prev) => ({ ...prev, [selectedId]: 0 }))
+      discardIntentNote(selectedId)
+    }
+    setTransient(next)
+  }
+
+  function handleSend() {
+    const durationSec = durationById[selectedId] ?? recSeconds
+    sendIntentNote(selectedId, { durationSec })
+    // Clear transient so the store-derived 'sent' state takes over cleanly.
+    setStateById((prev) => {
+      const next = { ...prev }
+      delete next[selectedId]
+      return next
+    })
   }
 
   return (
@@ -29,7 +69,10 @@ export default function ChangesView() {
         change={selected}
         author={users[selected.authorId]}
         intentState={intentState}
-        onIntentChange={setIntentState}
+        seconds={recSeconds}
+        duration={duration}
+        onIntentChange={handleIntentChange}
+        onSend={handleSend}
       />
     </div>
   )

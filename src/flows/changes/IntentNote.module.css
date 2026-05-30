@@ -12,6 +12,7 @@
   background: transparent;
   cursor: pointer;
   transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  animation: cardIn var(--dur) var(--ease);
 }
 .empty:hover {
   border-color: var(--indigo-300);
@@ -42,6 +43,18 @@
   border: 1px solid var(--border-muted);
   border-radius: var(--radius-lg);
   background: var(--bg-subtle);
+  animation: cardIn var(--dur) var(--ease);
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .cardLabel {
@@ -186,6 +199,18 @@
   background: var(--bg);
   border: 1px solid var(--border-muted);
   border-radius: var(--radius-md);
+  animation: summaryIn var(--dur-slow) var(--ease);
+}
+
+@keyframes summaryIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .summaryLabel {
   display: inline-flex;
@@ -202,4 +227,12 @@
   font-size: var(--fs-body);
   line-height: 1.55;
   color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .empty,
+  .card,
+  .summary {
+    animation: none;
+  }
 }

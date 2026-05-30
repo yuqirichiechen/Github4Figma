@@ -1,7 +1,15 @@
 import IntentNote from './IntentNote'
 import styles from './ComponentDetail.module.css'
 
-export default function ComponentDetail({ change, author, intentState, onIntentChange }) {
+export default function ComponentDetail({
+  change,
+  author,
+  intentState,
+  seconds,
+  duration,
+  onIntentChange,
+  onSend,
+}) {
   return (
     <section className={styles.detail}>
       <div className={styles.inner}>
@@ -18,8 +26,11 @@ export default function ComponentDetail({ change, author, intentState, onIntentC
 
         <IntentNote
           state={intentState}
+          seconds={seconds}
+          duration={duration}
           summary={change.seededSummary}
           onChange={onIntentChange}
+          onSend={onSend}
         />
       </div>
     </section>
