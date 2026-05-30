@@ -46,6 +46,21 @@ export function AppProvider({ children }) {
     ])
   }
 
+  // Add a reviewer note from the Comment / Request Change composer.
+  function addReviewNote({ text, tag }) {
+    setReviewNotes((prev) => [
+      {
+        id: `note-manual-${Date.now()}`,
+        authorId: 'richie',
+        time: 'just now',
+        text,
+        tag,
+        status: 'open',
+      },
+      ...prev,
+    ])
+  }
+
   function discardIntentNote(changeId) {
     setChanges((prev) =>
       prev.map((c) => (c.id === changeId ? { ...c, intentNote: null } : c))
@@ -78,6 +93,7 @@ export function AppProvider({ children }) {
       approval,
       sendIntentNote,
       discardIntentNote,
+      addReviewNote,
       approveDesign,
       finishApproval,
       resetApproval,

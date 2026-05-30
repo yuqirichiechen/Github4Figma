@@ -1,6 +1,7 @@
 import { CheckCircle2, AlertCircle, MessageSquare, ListChecks } from 'lucide-react'
 import VersionTimeline from './VersionTimeline'
 import Button from '../../components/Button'
+import Spinner from '../../components/Spinner'
 import styles from './ReviewCenter.module.css'
 
 function ScreenThumb({ label, approved }) {
@@ -27,19 +28,36 @@ export default function ReviewCenter({
   versions,
   screens,
   meta,
-  approved = false,
+  approval = 'idle',
   onApprove,
+  onRequestChange,
+  onComment,
 }) {
+  const submitting = approval === 'submitting'
+  const approved = approval === 'approved'
+
   return (
     <section className={styles.center}>
       <div className={styles.timelineWrap}>
         <VersionTimeline versions={versions} approved={approved} />
       </div>
 
-      <div className={styles.thumbs}>
-        {screens.map((s) => (
-          <ScreenThumb key={s.id} label={s.label} approved={approved} />
-        ))}
+      <div className={styles.thumbsWrap}>
+        <div className={styles.thumbs}>
+          {screens.map((s) => (
+            <ScreenThumb key={s.id} label={s.label} approved={approved} />
+          ))}
+        </div>
+
+        {submitting && (
+          <div className={styles.overlay}>
+            <Spinner tone="green" size={34} />
+            <span className={styles.overlayTitle}>Submitting Approval…</span>
+            <span className={styles.overlaySub}>
+              Notifying {meta.collaborators} collaborators
+            </span>
+          </div>
+        )}
       </div>
 
       <div className={`${styles.summary} ${approved ? styles.summaryDone : ''}`}>
@@ -62,17 +80,37 @@ export default function ReviewCenter({
       <div className={styles.actions}>
         <Button
           variant="success"
-          icon={CheckCircle2}
+          icon={approved ? CheckCircle2 : undefined}
           className={styles.action}
           onClick={onApprove}
-          disabled={approved}
+          disabled={submitting || approved}
         >
-          {approved ? 'Approved!' : 'Approve'}
+          {submitting ? (
+            <span className={styles.loadingLabel}>
+              <Spinner tone="white" size={15} /> Approving…
+            </span>
+          ) : approved ? (
+            'Approved!'
+          ) : (
+            'Approve'
+          )}
         </Button>
-        <Button variant="dangerOutline" icon={AlertCircle} className={styles.action} disabled={approved}>
+        <Button
+          variant="dangerOutline"
+          icon={AlertCircle}
+          className={styles.action}
+          onClick={onRequestChange}
+          disabled={submitting || approved}
+        >
           Request Change
         </Button>
-        <Button variant="ghost" icon={MessageSquare} className={styles.action} disabled={approved}>
+        <Button
+          variant="ghost"
+          icon={MessageSquare}
+          className={styles.action}
+          onClick={onComment}
+          disabled={submitting || approved}
+        >
           Comment
         </Button>
       </div>

@@ -4,13 +4,24 @@ import { files, versions, screens } from '../../data/files'
 import FilesPanel from './FilesPanel'
 import ReviewCenter from './ReviewCenter'
 import ReviewDetails from './ReviewDetails'
+import ApproveDialog from './ApproveDialog'
+import ReviewComposer from './ReviewComposer'
 import styles from './ReviewView.module.css'
 
 export default function ReviewView() {
-  const { users, reviewNotes, reviewMeta, approval } = useStore()
+  const { users, reviewNotes, reviewMeta, approval, approveDesign, finishApproval, addReviewNote } =
+    useStore()
   const [selectedFile, setSelectedFile] = useState(files[0].id)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [composer, setComposer] = useState(null) // 'comment' | 'request' | null
 
   const approved = approval === 'approved'
+
+  function confirmApprove() {
+    setDialogOpen(false)
+    approveDesign() // -> 'submitting'
+    setTimeout(finishApproval, 1600) // -> 'approved' + resolve notes
+  }
 
   return (
     <div className={styles.view}>
@@ -24,10 +35,24 @@ export default function ReviewView() {
         versions={versions}
         screens={screens}
         meta={reviewMeta}
-        approved={approved}
-        onApprove={() => {}}
+        approval={approval}
+        onApprove={() => setDialogOpen(true)}
+        onRequestChange={() => setComposer('request')}
+        onComment={() => setComposer('comment')}
       />
       <ReviewDetails notes={reviewNotes} users={users} approved={approved} />
+
+      <ApproveDialog
+        open={dialogOpen}
+        onCancel={() => setDialogOpen(false)}
+        onConfirm={confirmApprove}
+      />
+      <ReviewComposer
+        kind={composer}
+        open={composer !== null}
+        onClose={() => setComposer(null)}
+        onSubmit={addReviewNote}
+      />
     </div>
   )
 }

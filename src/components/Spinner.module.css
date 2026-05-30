@@ -1,0 +1,25 @@
+.spinner {
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  border: 2.5px solid transparent;
+  animation: spin 700ms linear infinite;
+}
+
+.green {
+  border-color: rgba(31, 136, 61, 0.25);
+  border-top-color: var(--green-600);
+}
+.indigo {
+  border-color: rgba(91, 91, 214, 0.25);
+  border-top-color: var(--indigo-500);
+}
+.white {
+  border-color: rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
