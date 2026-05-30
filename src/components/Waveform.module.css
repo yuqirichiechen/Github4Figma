@@ -1,0 +1,46 @@
+.wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  flex: 1;
+  min-width: 0;
+}
+
+.bar {
+  flex: 1;
+  min-width: 2px;
+  max-width: 4px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  opacity: 0.85;
+}
+
+.indigo {
+  color: var(--indigo-500);
+}
+.red {
+  color: var(--red-600);
+}
+
+/* Live motion — used in Sprint 2's recording state */
+.animated .bar {
+  animation: pulse 900ms var(--ease) infinite;
+  animation-delay: calc(var(--i) * 40ms);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated .bar {
+    animation: none;
+  }
+}

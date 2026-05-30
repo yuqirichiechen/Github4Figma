@@ -1,0 +1,205 @@
+/* ---- Empty (dashed prompt) ---- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 30px 20px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.empty:hover {
+  border-color: var(--indigo-300);
+  background: var(--indigo-100);
+}
+
+.emptyMic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--indigo-100);
+  color: var(--indigo-500);
+}
+.emptyLabel {
+  font-size: var(--fs-body);
+  color: var(--text-muted);
+}
+
+/* ---- Shared card ---- */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-lg);
+  background: var(--bg-subtle);
+}
+
+.cardLabel {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---- Ready ---- */
+.micBtn {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--indigo-500);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(91, 91, 214, 0.4);
+  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.micBtn:hover {
+  background: var(--indigo-700);
+  transform: scale(1.05);
+}
+.micBtn:active {
+  transform: scale(0.97);
+}
+.hint {
+  align-self: center;
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+}
+
+/* ---- Recording ---- */
+.recording {
+  background: var(--red-100);
+  border-color: rgba(207, 34, 46, 0.25);
+}
+.recHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.recLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--red-600);
+}
+.recDot {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-pill);
+  background: var(--red-600);
+  animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+.recTime {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--red-600);
+  font-variant-numeric: tabular-nums;
+}
+.recWave {
+  display: flex;
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: var(--radius-md);
+}
+.fullBtn {
+  width: 100%;
+}
+
+/* ---- Player (playback + sent) ---- */
+.player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--indigo-100);
+  border-radius: var(--radius-md);
+}
+.playerSent {
+  background: var(--indigo-100);
+}
+.playBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--indigo-500);
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.playBtn:hover {
+  background: var(--indigo-700);
+}
+.playBtn:active {
+  transform: scale(0.95);
+}
+.dur {
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--indigo-700);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+.grow {
+  flex: 1;
+}
+
+/* ---- Sent / AI summary ---- */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: var(--bg);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-md);
+}
+.summaryLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--indigo-700);
+}
+.summaryText {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--text);
+}
