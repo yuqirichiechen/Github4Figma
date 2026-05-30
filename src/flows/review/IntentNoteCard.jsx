@@ -9,8 +9,13 @@ const TAG_TONE = {
 
 export default function IntentNoteCard({ note, author }) {
   const resolved = note.status === 'resolved'
+  const isNew = !resolved && note.time === 'just now'
   return (
-    <article className={`${styles.card} ${resolved ? styles.resolved : ''}`}>
+    <article
+      className={`${styles.card} ${resolved ? styles.resolved : ''} ${
+        isNew ? styles.fresh : ''
+      }`}
+    >
       <header className={styles.head}>
         <span className={styles.who}>
           {resolved ? (

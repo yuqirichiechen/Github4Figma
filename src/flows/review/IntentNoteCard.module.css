@@ -13,6 +13,20 @@
   border-color: rgba(31, 136, 61, 0.25);
 }
 
+/* Freshly added (this session) — soft indigo highlight that settles in. */
+.fresh {
+  border-color: var(--indigo-300);
+  box-shadow: 0 0 0 3px var(--indigo-100);
+  animation: freshIn var(--dur-slow) var(--ease);
+}
+
+@keyframes freshIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
 .head {
   display: flex;
   align-items: center;

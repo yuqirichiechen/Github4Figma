@@ -3,4 +3,5 @@
   display: flex;
   min-height: 0;
   min-width: 0;
+  animation: viewIn var(--dur) var(--ease);
 }
