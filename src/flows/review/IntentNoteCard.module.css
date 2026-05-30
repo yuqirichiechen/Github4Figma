@@ -1,0 +1,56 @@
+.card {
+  padding: 12px 14px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.resolved {
+  background: var(--green-100);
+  border-color: rgba(31, 136, 61, 0.25);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.radio {
+  color: var(--border);
+  flex-shrink: 0;
+}
+.tick {
+  color: var(--green-600);
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.text {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--text-muted);
+  padding-left: 22px;
+}

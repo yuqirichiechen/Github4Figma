@@ -17,6 +17,14 @@ export const seedReviewNotes = [
     tag: 'Intent Captured',
     status: 'open',
   },
+  {
+    id: 'note-kevin',
+    authorId: 'kevin',
+    time: 'Yesterday',
+    text: 'Contrast on the secondary buttons looks low — worth another pass.',
+    tag: 'Needs Attention',
+    status: 'open',
+  },
 ]
 
 export const reviewMeta = {
