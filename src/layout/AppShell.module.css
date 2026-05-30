@@ -1,0 +1,17 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  background: var(--bg);
+  border-left: 1px solid var(--border-muted);
+  border-right: 1px solid var(--border-muted);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}

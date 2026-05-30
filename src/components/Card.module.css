@@ -1,0 +1,29 @@
+.card {
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+}
+
+.default {
+  border: 1px solid var(--border-muted);
+  box-shadow: var(--shadow-sm);
+}
+
+.subtle {
+  border: 1px solid var(--border-muted);
+  background: var(--bg-subtle);
+}
+
+.dashed {
+  border: 1.5px dashed var(--border);
+  background: transparent;
+}
+
+.p-none {
+  padding: 0;
+}
+.p-sm {
+  padding: 12px;
+}
+.p-md {
+  padding: 18px;
+}

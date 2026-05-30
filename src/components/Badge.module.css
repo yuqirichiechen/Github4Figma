@@ -1,0 +1,32 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.neutral {
+  background: var(--bg-inset);
+  color: var(--text-muted);
+}
+.indigo {
+  background: var(--indigo-100);
+  color: var(--indigo-700);
+}
+.amber {
+  background: var(--amber-100);
+  color: #8a6d1a;
+}
+.green {
+  background: var(--green-100);
+  color: var(--green-700);
+}
+.red {
+  background: var(--red-100);
+  color: var(--red-700);
+}
