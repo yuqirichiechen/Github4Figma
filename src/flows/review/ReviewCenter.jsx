@@ -1,4 +1,4 @@
-import { CheckCircle2, AlertCircle, MessageSquare, ListChecks } from 'lucide-react'
+import { CheckCircle2, AlertCircle, MessageSquare, ListChecks, Lock } from 'lucide-react'
 import VersionTimeline from './VersionTimeline'
 import Button from '../../components/Button'
 import Spinner from '../../components/Spinner'
@@ -26,6 +26,10 @@ function ScreenThumb({ label, approved }) {
 
 export default function ReviewCenter({
   versions,
+  selectedVersion,
+  onSelectVersion,
+  versionInfo,
+  users,
   screens,
   meta,
   status = 'reviewing',
@@ -34,19 +38,28 @@ export default function ReviewCenter({
   onRequestChange,
   onComment,
 }) {
-  const submitting = status === 'submitting'
-  const approved = status === 'approved'
+  const viewingPast = selectedVersion !== 'current'
+  const submitting = !viewingPast && status === 'submitting'
+  const currentApproved = !viewingPast && status === 'approved'
+  const thumbsApproved = viewingPast || currentApproved // past versions are historical, locked-in
+
+  const approver = versionInfo?.by ? users[versionInfo.by] : null
 
   return (
     <section className={styles.center}>
       <div className={styles.timelineWrap}>
-        <VersionTimeline versions={versions} approved={approved} />
+        <VersionTimeline
+          versions={versions}
+          selectedId={selectedVersion}
+          currentStatus={status}
+          onSelect={onSelectVersion}
+        />
       </div>
 
       <div className={styles.thumbsWrap}>
         <div className={styles.thumbs}>
           {screens.map((s) => (
-            <ScreenThumb key={s.id} label={s.label} approved={approved} />
+            <ScreenThumb key={s.id} label={s.label} approved={thumbsApproved} />
           ))}
         </div>
 
@@ -61,60 +74,83 @@ export default function ReviewCenter({
         )}
       </div>
 
-      <div className={`${styles.summary} ${approved ? styles.summaryDone : ''}`}>
-        {approved ? (
-          <>
+      {viewingPast ? (
+        /* ---- historical version: read-only, already approved ---- */
+        <>
+          <div className={`${styles.summary} ${styles.summaryDone}`}>
             <CheckCircle2 size={16} strokeWidth={2.5} />
-            <span>{fileName} approved by you · collaborators notified.</span>
-          </>
-        ) : (
-          <>
-            <ListChecks size={16} strokeWidth={2.5} />
             <span>
-              All intent notes reviewed. {meta.resolvedCount} resolved,{' '}
-              {meta.needsAttention} needs attention.
+              {versionInfo.label} approved
+              {approver ? ` by ${approver.name}` : ''} · {versionInfo.when}
             </span>
-          </>
-        )}
-      </div>
+          </div>
+          <div className={styles.locked}>
+            <Lock size={15} strokeWidth={2} />
+            <span>
+              This version is locked. Switch to <strong>Current</strong> to review and
+              approve.
+            </span>
+          </div>
+        </>
+      ) : (
+        /* ---- current version: live review ---- */
+        <>
+          <div className={`${styles.summary} ${currentApproved ? styles.summaryDone : ''}`}>
+            {currentApproved ? (
+              <>
+                <CheckCircle2 size={16} strokeWidth={2.5} />
+                <span>{fileName} · Current approved by you · collaborators notified.</span>
+              </>
+            ) : (
+              <>
+                <ListChecks size={16} strokeWidth={2.5} />
+                <span>
+                  All intent notes reviewed. {meta.resolvedCount} resolved,{' '}
+                  {meta.needsAttention} needs attention.
+                </span>
+              </>
+            )}
+          </div>
 
-      <div className={styles.actions}>
-        <Button
-          variant="success"
-          icon={approved ? CheckCircle2 : undefined}
-          className={styles.action}
-          onClick={onApprove}
-          disabled={submitting || approved}
-        >
-          {submitting ? (
-            <span className={styles.loadingLabel}>
-              <Spinner tone="white" size={15} /> Approving…
-            </span>
-          ) : approved ? (
-            'Approved!'
-          ) : (
-            'Approve'
-          )}
-        </Button>
-        <Button
-          variant="dangerOutline"
-          icon={AlertCircle}
-          className={styles.action}
-          onClick={onRequestChange}
-          disabled={submitting || approved}
-        >
-          Request Change
-        </Button>
-        <Button
-          variant="ghost"
-          icon={MessageSquare}
-          className={styles.action}
-          onClick={onComment}
-          disabled={submitting || approved}
-        >
-          Comment
-        </Button>
-      </div>
+          <div className={styles.actions}>
+            <Button
+              variant="success"
+              icon={currentApproved ? CheckCircle2 : undefined}
+              className={styles.action}
+              onClick={onApprove}
+              disabled={submitting || currentApproved}
+            >
+              {submitting ? (
+                <span className={styles.loadingLabel}>
+                  <Spinner tone="white" size={15} /> Approving…
+                </span>
+              ) : currentApproved ? (
+                'Approved!'
+              ) : (
+                'Approve'
+              )}
+            </Button>
+            <Button
+              variant="dangerOutline"
+              icon={AlertCircle}
+              className={styles.action}
+              onClick={onRequestChange}
+              disabled={submitting || currentApproved}
+            >
+              Request Change
+            </Button>
+            <Button
+              variant="ghost"
+              icon={MessageSquare}
+              className={styles.action}
+              onClick={onComment}
+              disabled={submitting || currentApproved}
+            >
+              Comment
+            </Button>
+          </div>
+        </>
+      )}
     </section>
   )
 }

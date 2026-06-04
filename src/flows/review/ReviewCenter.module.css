@@ -121,6 +121,23 @@
   color: var(--green-700);
 }
 
+/* ---- historical version lock notice ---- */
+.locked {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-size: var(--fs-body);
+}
+.locked strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 /* ---- actions ---- */
 .actions {
   display: flex;

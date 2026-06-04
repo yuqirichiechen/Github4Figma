@@ -9,13 +9,12 @@ const crumbs = ['GitHub for Figma', 'Mobile App Redesign', 'Review Session']
 
 export default function TopBar() {
   const navigate = useNavigate()
-  const { accounts, users, currentUserId, switchUser, reviewNotes } = useStore()
+  const { accounts, users, currentUserId, switchUser, openNoteCount } = useStore()
 
   const current = accounts.find((a) => a.id === currentUserId)
   const other = accounts.find((a) => a.id !== currentUserId)
 
-  const openCount = reviewNotes.filter((n) => n.status === 'open').length
-  const showBadge = openCount > 0
+  const showBadge = openNoteCount > 0
 
   function handleSwitch(id) {
     switchUser(id)
@@ -55,7 +54,7 @@ export default function TopBar() {
         >
           <MessagesSquare size={15} strokeWidth={2.5} />
           Review
-          {showBadge && <span className={styles.count}>{openCount}</span>}
+          {showBadge && <span className={styles.count}>{openNoteCount}</span>}
         </NavLink>
       </nav>
 

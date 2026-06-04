@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useStore } from '../../store/AppStore'
-import { files, versions, screens } from '../../data/files'
+import { files } from '../../data/files'
 import FilesPanel from './FilesPanel'
 import ReviewCenter from './ReviewCenter'
 import ReviewDetails from './ReviewDetails'
@@ -12,26 +12,41 @@ export default function ReviewView() {
   const {
     users,
     currentUser,
-    reviewNotes,
-    reviewMeta,
+    notesByFile,
     fileApproval,
-    sessionApproved,
     approveFile,
     finishApproveFile,
     addReviewNote,
     addReply,
   } = useStore()
   const [selectedFile, setSelectedFile] = useState(files[0].id)
+  const [selectedVersion, setSelectedVersion] = useState('current')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [composer, setComposer] = useState(null) // 'comment' | 'request' | null
 
-  const selected = files.find((f) => f.id === selectedFile)
-  const selectedStatus = fileApproval[selectedFile] // 'reviewing' | 'submitting' | 'approved'
+  const file = files.find((f) => f.id === selectedFile)
+  const notes = notesByFile[selectedFile]
+  const fileStatus = fileApproval[selectedFile] // 'reviewing' | 'submitting' | 'approved'
+  const fileApproved = fileStatus === 'approved'
+  const versionInfo = file.versions.find((v) => v.id === selectedVersion)
+
+  const meta = {
+    resolvedCount: notes.filter((n) => n.status === 'resolved').length,
+    needsAttention: notes.filter(
+      (n) => n.tag === 'Needs Attention' && n.status === 'open'
+    ).length,
+    collaborators: 3,
+  }
+
+  function selectFile(id) {
+    setSelectedFile(id)
+    setSelectedVersion('current') // always land on the live version
+  }
 
   function confirmApprove() {
     setDialogOpen(false)
     approveFile(selectedFile) // -> this file 'submitting'
-    setTimeout(() => finishApproveFile(selectedFile), 1600) // -> this file 'approved'
+    setTimeout(() => finishApproveFile(selectedFile), 1600) // -> 'approved' + resolve its notes
   }
 
   return (
@@ -40,29 +55,33 @@ export default function ReviewView() {
         files={files}
         fileApproval={fileApproval}
         selectedId={selectedFile}
-        onSelect={setSelectedFile}
+        onSelect={selectFile}
       />
       <ReviewCenter
-        versions={versions}
-        screens={screens}
-        meta={reviewMeta}
-        status={selectedStatus}
-        fileName={selected.name}
+        versions={file.versions}
+        selectedVersion={selectedVersion}
+        onSelectVersion={setSelectedVersion}
+        versionInfo={versionInfo}
+        users={users}
+        screens={file.screens}
+        meta={meta}
+        status={fileStatus}
+        fileName={file.name}
         onApprove={() => setDialogOpen(true)}
         onRequestChange={() => setComposer('request')}
         onComment={() => setComposer('comment')}
       />
       <ReviewDetails
-        notes={reviewNotes}
+        notes={notes}
         users={users}
         currentUser={currentUser}
-        onAddReply={addReply}
-        approved={sessionApproved}
+        onAddReply={(noteId, payload) => addReply(selectedFile, noteId, payload)}
+        approved={fileApproved}
       />
 
       <ApproveDialog
         open={dialogOpen}
-        fileName={selected.name}
+        fileName={file.name}
         onCancel={() => setDialogOpen(false)}
         onConfirm={confirmApprove}
       />
@@ -70,7 +89,7 @@ export default function ReviewView() {
         kind={composer}
         open={composer !== null}
         onClose={() => setComposer(null)}
-        onSubmit={addReviewNote}
+        onSubmit={(payload) => addReviewNote(selectedFile, payload)}
       />
     </div>
   )

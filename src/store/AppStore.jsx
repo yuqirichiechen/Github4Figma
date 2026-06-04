@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useMemo, useState } from 'react'
 import { changes as seedChanges } from '../data/changes'
-import { seedReviewNotes, reviewMeta } from '../data/reviewNotes'
 import { users, accounts } from '../data/users'
 import { files } from '../data/files'
 
@@ -11,33 +10,31 @@ const initialFileApproval = Object.fromEntries(
   files.map((f) => [f.id, 'reviewing']) // 'reviewing' | 'submitting' | 'approved'
 )
 
+// Notes live per file: { [fileId]: [note, ...] }.
+const initialNotesByFile = Object.fromEntries(files.map((f) => [f.id, f.notes]))
+
 export function AppProvider({ children }) {
   const [changes, setChanges] = useState(seedChanges)
-  const [reviewNotes, setReviewNotes] = useState(seedReviewNotes)
+  const [notesByFile, setNotesByFile] = useState(initialNotesByFile)
   const [fileApproval, setFileApproval] = useState(initialFileApproval)
   const [currentUserId, setCurrentUserId] = useState('richie')
 
   const sessionApproved = files.every((f) => fileApproval[f.id] === 'approved')
-
-  // Resolve all intent notes only once the entire session is approved.
-  useEffect(() => {
-    if (!files.every((f) => fileApproval[f.id] === 'approved')) return
-    setReviewNotes((prev) =>
-      prev.every((n) => n.status === 'resolved')
-        ? prev
-        : prev.map((n) => ({ ...n, status: 'resolved' }))
-    )
-  }, [fileApproval])
+  const openNoteCount = Object.values(notesByFile).reduce(
+    (sum, list) => sum + list.filter((n) => n.status === 'open').length,
+    0
+  )
 
   // Switch the active account (Designer / Reviewer). Navigation handled by caller.
   function switchUser(id) {
     setCurrentUserId(id)
   }
 
-  // Attach an intent note to a change AND surface it in the review panel.
+  // Attach an intent note to a change AND surface it under that change's review file.
   function sendIntentNote(changeId, { durationSec }) {
     const change = changes.find((c) => c.id === changeId)
     if (!change) return
+    const fileId = change.reviewFileId
 
     setChanges((prev) =>
       prev.map((c) =>
@@ -56,48 +53,62 @@ export function AppProvider({ children }) {
       )
     )
 
-    setReviewNotes((prev) => [
-      {
-        id: `note-${changeId}`,
-        authorId: currentUserId,
-        time: 'just now',
-        text: change.seededSummary,
-        tag: 'Intent Captured',
-        status: 'open',
-        replies: [],
-      },
-      ...prev.filter((n) => n.id !== `note-${changeId}`),
-    ])
+    setNotesByFile((prev) => ({
+      ...prev,
+      [fileId]: [
+        {
+          id: `note-${changeId}`,
+          authorId: currentUserId,
+          time: 'just now',
+          text: change.seededSummary,
+          tag: 'Intent Captured',
+          status: 'open',
+          replies: [],
+        },
+        ...prev[fileId].filter((n) => n.id !== `note-${changeId}`),
+      ],
+    }))
   }
 
   // Remove a just-sent intent note (Gmail-style undo window).
   function undoSend(changeId) {
-    setReviewNotes((prev) => prev.filter((n) => n.id !== `note-${changeId}`))
+    const change = changes.find((c) => c.id === changeId)
+    if (!change) return
+    const fileId = change.reviewFileId
+
+    setNotesByFile((prev) => ({
+      ...prev,
+      [fileId]: prev[fileId].filter((n) => n.id !== `note-${changeId}`),
+    }))
     setChanges((prev) =>
       prev.map((c) => (c.id === changeId ? { ...c, intentNote: null } : c))
     )
   }
 
-  // Add a reviewer note from the Comment / Request Change composer.
-  function addReviewNote({ text, tag }) {
-    setReviewNotes((prev) => [
-      {
-        id: `note-manual-${Date.now()}`,
-        authorId: currentUserId,
-        time: 'just now',
-        text,
-        tag,
-        status: 'open',
-        replies: [],
-      },
+  // Add a reviewer note (Comment / Request Change) to a specific file.
+  function addReviewNote(fileId, { text, tag }) {
+    setNotesByFile((prev) => ({
       ...prev,
-    ])
+      [fileId]: [
+        {
+          id: `note-manual-${Date.now()}`,
+          authorId: currentUserId,
+          time: 'just now',
+          text,
+          tag,
+          status: 'open',
+          replies: [],
+        },
+        ...prev[fileId],
+      ],
+    }))
   }
 
-  // Append a threaded reply to a review note, authored by the current user.
-  function addReply(noteId, { text }) {
-    setReviewNotes((prev) =>
-      prev.map((n) =>
+  // Append a threaded reply to a note within a file, authored by the current user.
+  function addReply(fileId, noteId, { text }) {
+    setNotesByFile((prev) => ({
+      ...prev,
+      [fileId]: prev[fileId].map((n) =>
         n.id === noteId
           ? {
               ...n,
@@ -112,8 +123,8 @@ export function AppProvider({ children }) {
               ],
             }
           : n
-      )
-    )
+      ),
+    }))
   }
 
   function discardIntentNote(changeId) {
@@ -122,13 +133,18 @@ export function AppProvider({ children }) {
     )
   }
 
-  // Approve a single file (shows its spinner), then mark it approved.
+  // Approve a single file (shows its spinner), then mark it approved and
+  // resolve that file's notes.
   function approveFile(fileId) {
     setFileApproval((prev) => ({ ...prev, [fileId]: 'submitting' }))
   }
 
   function finishApproveFile(fileId) {
     setFileApproval((prev) => ({ ...prev, [fileId]: 'approved' }))
+    setNotesByFile((prev) => ({
+      ...prev,
+      [fileId]: prev[fileId].map((n) => ({ ...n, status: 'resolved' })),
+    }))
   }
 
   function resetApprovals() {
@@ -142,8 +158,8 @@ export function AppProvider({ children }) {
       currentUserId,
       currentUser: users[currentUserId],
       changes,
-      reviewNotes,
-      reviewMeta,
+      notesByFile,
+      openNoteCount,
       fileApproval,
       sessionApproved,
       switchUser,
@@ -156,7 +172,7 @@ export function AppProvider({ children }) {
       finishApproveFile,
       resetApprovals,
     }),
-    [changes, reviewNotes, fileApproval, sessionApproved, currentUserId]
+    [changes, notesByFile, openNoteCount, fileApproval, sessionApproved, currentUserId]
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

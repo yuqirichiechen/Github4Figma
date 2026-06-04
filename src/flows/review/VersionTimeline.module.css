@@ -36,11 +36,17 @@
   justify-content: center;
   width: 20px;
   height: 20px;
+  padding: 0;
   border-radius: var(--radius-pill);
   border: 2px solid var(--border);
   background: var(--bg);
   color: #fff;
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    box-shadow var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.dot:hover {
+  transform: scale(1.12);
 }
 
 /* default review states */
@@ -59,11 +65,19 @@
   background: var(--green-600);
 }
 
+/* currently viewed version */
+.selected {
+  box-shadow: 0 0 0 4px var(--indigo-100);
+}
+
 .label {
   margin-top: 2px;
   font-size: var(--fs-meta);
   font-weight: 700;
-  color: var(--text);
+  color: var(--text-muted);
+}
+.labelSelected {
+  color: var(--indigo-700);
 }
 
 .when {
