@@ -1,15 +1,33 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { changes as seedChanges } from '../data/changes'
 import { seedReviewNotes, reviewMeta } from '../data/reviewNotes'
 import { users, accounts } from '../data/users'
+import { files } from '../data/files'
 
 const AppContext = createContext(null)
+
+// Each file is reviewed and approved independently.
+const initialFileApproval = Object.fromEntries(
+  files.map((f) => [f.id, 'reviewing']) // 'reviewing' | 'submitting' | 'approved'
+)
 
 export function AppProvider({ children }) {
   const [changes, setChanges] = useState(seedChanges)
   const [reviewNotes, setReviewNotes] = useState(seedReviewNotes)
-  const [approval, setApproval] = useState('idle') // 'idle' | 'submitting' | 'approved'
+  const [fileApproval, setFileApproval] = useState(initialFileApproval)
   const [currentUserId, setCurrentUserId] = useState('richie')
+
+  const sessionApproved = files.every((f) => fileApproval[f.id] === 'approved')
+
+  // Resolve all intent notes only once the entire session is approved.
+  useEffect(() => {
+    if (!files.every((f) => fileApproval[f.id] === 'approved')) return
+    setReviewNotes((prev) =>
+      prev.every((n) => n.status === 'resolved')
+        ? prev
+        : prev.map((n) => ({ ...n, status: 'resolved' }))
+    )
+  }, [fileApproval])
 
   // Switch the active account (Designer / Reviewer). Navigation handled by caller.
   function switchUser(id) {
@@ -104,21 +122,17 @@ export function AppProvider({ children }) {
     )
   }
 
-  function resolveAllNotes() {
-    setReviewNotes((prev) => prev.map((n) => ({ ...n, status: 'resolved' })))
+  // Approve a single file (shows its spinner), then mark it approved.
+  function approveFile(fileId) {
+    setFileApproval((prev) => ({ ...prev, [fileId]: 'submitting' }))
   }
 
-  function approveDesign() {
-    setApproval('submitting')
+  function finishApproveFile(fileId) {
+    setFileApproval((prev) => ({ ...prev, [fileId]: 'approved' }))
   }
 
-  function finishApproval() {
-    setApproval('approved')
-    resolveAllNotes()
-  }
-
-  function resetApproval() {
-    setApproval('idle')
+  function resetApprovals() {
+    setFileApproval(initialFileApproval)
   }
 
   const value = useMemo(
@@ -130,18 +144,19 @@ export function AppProvider({ children }) {
       changes,
       reviewNotes,
       reviewMeta,
-      approval,
+      fileApproval,
+      sessionApproved,
       switchUser,
       sendIntentNote,
       undoSend,
       discardIntentNote,
       addReviewNote,
       addReply,
-      approveDesign,
-      finishApproval,
-      resetApproval,
+      approveFile,
+      finishApproveFile,
+      resetApprovals,
     }),
-    [changes, reviewNotes, approval, currentUserId]
+    [changes, reviewNotes, fileApproval, sessionApproved, currentUserId]
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

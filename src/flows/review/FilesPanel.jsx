@@ -1,7 +1,7 @@
 import { FileText, Plus, CheckCircle2 } from 'lucide-react'
 import styles from './FilesPanel.module.css'
 
-export default function FilesPanel({ files, selectedId, onSelect, approved = false }) {
+export default function FilesPanel({ files, fileApproval = {}, selectedId, onSelect }) {
   return (
     <aside className={styles.panel}>
       <div className={styles.header}>
@@ -14,6 +14,7 @@ export default function FilesPanel({ files, selectedId, onSelect, approved = fal
       <ul className={styles.list}>
         {files.map((f) => {
           const selected = f.id === selectedId
+          const isApproved = fileApproval[f.id] === 'approved'
           return (
             <li key={f.id}>
               <button
@@ -22,7 +23,7 @@ export default function FilesPanel({ files, selectedId, onSelect, approved = fal
                 aria-current={selected ? 'true' : undefined}
               >
                 <span className={styles.icon}>
-                  {approved && selected ? (
+                  {isApproved ? (
                     <CheckCircle2 size={18} strokeWidth={2} className={styles.check} />
                   ) : (
                     <FileText size={18} strokeWidth={2} />

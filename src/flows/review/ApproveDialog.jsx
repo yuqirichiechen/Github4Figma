@@ -3,7 +3,7 @@ import Modal from '../../components/Modal'
 import Button from '../../components/Button'
 import styles from './ApproveDialog.module.css'
 
-export default function ApproveDialog({ open, onCancel, onConfirm }) {
+export default function ApproveDialog({ open, fileName, onCancel, onConfirm }) {
   return (
     <Modal open={open} onClose={onCancel} labelledBy="approve-title">
       <div className={styles.body}>
@@ -17,11 +17,11 @@ export default function ApproveDialog({ open, onCancel, onConfirm }) {
         </div>
 
         <h3 id="approve-title" className={styles.title}>
-          Approve this design?
+          Approve this file?
         </h3>
         <p className={styles.text}>
-          You’re approving the <strong>Mobile App Redesign v3</strong> for
-          production. This will notify all collaborators.
+          You’re approving <strong>{fileName}</strong> for production. This will
+          notify all collaborators.
         </p>
 
         <div className={styles.actions}>

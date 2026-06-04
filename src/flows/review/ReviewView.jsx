@@ -14,9 +14,10 @@ export default function ReviewView() {
     currentUser,
     reviewNotes,
     reviewMeta,
-    approval,
-    approveDesign,
-    finishApproval,
+    fileApproval,
+    sessionApproved,
+    approveFile,
+    finishApproveFile,
     addReviewNote,
     addReply,
   } = useStore()
@@ -24,27 +25,29 @@ export default function ReviewView() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [composer, setComposer] = useState(null) // 'comment' | 'request' | null
 
-  const approved = approval === 'approved'
+  const selected = files.find((f) => f.id === selectedFile)
+  const selectedStatus = fileApproval[selectedFile] // 'reviewing' | 'submitting' | 'approved'
 
   function confirmApprove() {
     setDialogOpen(false)
-    approveDesign() // -> 'submitting'
-    setTimeout(finishApproval, 1600) // -> 'approved' + resolve notes
+    approveFile(selectedFile) // -> this file 'submitting'
+    setTimeout(() => finishApproveFile(selectedFile), 1600) // -> this file 'approved'
   }
 
   return (
     <div className={styles.view}>
       <FilesPanel
         files={files}
+        fileApproval={fileApproval}
         selectedId={selectedFile}
         onSelect={setSelectedFile}
-        approved={approved}
       />
       <ReviewCenter
         versions={versions}
         screens={screens}
         meta={reviewMeta}
-        approval={approval}
+        status={selectedStatus}
+        fileName={selected.name}
         onApprove={() => setDialogOpen(true)}
         onRequestChange={() => setComposer('request')}
         onComment={() => setComposer('comment')}
@@ -54,11 +57,12 @@ export default function ReviewView() {
         users={users}
         currentUser={currentUser}
         onAddReply={addReply}
-        approved={approved}
+        approved={sessionApproved}
       />
 
       <ApproveDialog
         open={dialogOpen}
+        fileName={selected.name}
         onCancel={() => setDialogOpen(false)}
         onConfirm={confirmApprove}
       />

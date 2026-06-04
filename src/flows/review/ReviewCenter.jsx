@@ -28,13 +28,14 @@ export default function ReviewCenter({
   versions,
   screens,
   meta,
-  approval = 'idle',
+  status = 'reviewing',
+  fileName,
   onApprove,
   onRequestChange,
   onComment,
 }) {
-  const submitting = approval === 'submitting'
-  const approved = approval === 'approved'
+  const submitting = status === 'submitting'
+  const approved = status === 'approved'
 
   return (
     <section className={styles.center}>
@@ -64,7 +65,7 @@ export default function ReviewCenter({
         {approved ? (
           <>
             <CheckCircle2 size={16} strokeWidth={2.5} />
-            <span>Design approved by you · all intent notes resolved.</span>
+            <span>{fileName} approved by you · collaborators notified.</span>
           </>
         ) : (
           <>
