@@ -7,6 +7,7 @@ export default function ReviewDetails({
   users,
   currentUser,
   onAddReply,
+  onResolve,
   approved = false,
 }) {
   return (
@@ -39,6 +40,7 @@ export default function ReviewDetails({
             users={users}
             currentUser={currentUser}
             onAddReply={onAddReply}
+            onResolve={onResolve}
             approved={approved}
           />
         ))}

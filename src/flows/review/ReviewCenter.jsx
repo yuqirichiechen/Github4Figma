@@ -1,4 +1,4 @@
-import { CheckCircle2, AlertCircle, MessageSquare, ListChecks, Lock } from 'lucide-react'
+import { CheckCircle2, AlertCircle, MessageSquare, ListChecks, Lock, AlertTriangle } from 'lucide-react'
 import VersionTimeline from './VersionTimeline'
 import Button from '../../components/Button'
 import Spinner from '../../components/Spinner'
@@ -34,6 +34,7 @@ export default function ReviewCenter({
   meta,
   status = 'reviewing',
   fileName,
+  approveError = 0,
   onApprove,
   onRequestChange,
   onComment,
@@ -111,6 +112,17 @@ export default function ReviewCenter({
               </>
             )}
           </div>
+
+          {approveError > 0 && (
+            <div className={styles.error} role="alert">
+              <AlertTriangle size={16} strokeWidth={2.5} />
+              <span>
+                Issues not resolved — {approveError}{' '}
+                {approveError === 1 ? 'item needs' : 'items need'} attention. Resolve
+                {approveError === 1 ? ' it' : ' them'} before approving.
+              </span>
+            </div>
+          )}
 
           <div className={styles.actions}>
             <Button

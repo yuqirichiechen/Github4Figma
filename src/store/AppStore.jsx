@@ -127,6 +127,16 @@ export function AppProvider({ children }) {
     }))
   }
 
+  // Mark a single note resolved (reviewer clears a flagged issue).
+  function resolveNote(fileId, noteId) {
+    setNotesByFile((prev) => ({
+      ...prev,
+      [fileId]: prev[fileId].map((n) =>
+        n.id === noteId ? { ...n, status: 'resolved' } : n
+      ),
+    }))
+  }
+
   function discardIntentNote(changeId) {
     setChanges((prev) =>
       prev.map((c) => (c.id === changeId ? { ...c, intentNote: null } : c))
@@ -168,6 +178,7 @@ export function AppProvider({ children }) {
       discardIntentNote,
       addReviewNote,
       addReply,
+      resolveNote,
       approveFile,
       finishApproveFile,
       resetApprovals,

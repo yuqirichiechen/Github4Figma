@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Circle, CheckCircle2, MessageSquare, ChevronDown, ChevronUp, Send } from 'lucide-react'
+import { Circle, CheckCircle2, MessageSquare, ChevronDown, ChevronUp, Send, Check } from 'lucide-react'
 import Badge from '../../components/Badge'
 import Avatar from '../../components/Avatar'
 import Button from '../../components/Button'
@@ -16,6 +16,7 @@ export default function IntentNoteCard({
   users,
   currentUser,
   onAddReply,
+  onResolve,
   approved = false,
 }) {
   const resolved = note.status === 'resolved'
@@ -59,19 +60,27 @@ export default function IntentNoteCard({
 
       <p className={styles.text}>{note.text}</p>
 
-      <button
-        className={styles.threadToggle}
-        onClick={() => setExpanded((e) => !e)}
-        aria-expanded={expanded}
-      >
-        <MessageSquare size={13} strokeWidth={2.5} />
-        {replies.length > 0 ? `${replies.length} repl${replies.length === 1 ? 'y' : 'ies'}` : 'Reply'}
-        {expanded ? (
-          <ChevronUp size={13} strokeWidth={2.5} />
-        ) : (
-          <ChevronDown size={13} strokeWidth={2.5} />
+      <div className={styles.cardActions}>
+        <button
+          className={styles.threadToggle}
+          onClick={() => setExpanded((e) => !e)}
+          aria-expanded={expanded}
+        >
+          <MessageSquare size={13} strokeWidth={2.5} />
+          {replies.length > 0 ? `${replies.length} repl${replies.length === 1 ? 'y' : 'ies'}` : 'Reply'}
+          {expanded ? (
+            <ChevronUp size={13} strokeWidth={2.5} />
+          ) : (
+            <ChevronDown size={13} strokeWidth={2.5} />
+          )}
+        </button>
+
+        {!resolved && (
+          <button className={styles.resolveBtn} onClick={() => onResolve(note.id)}>
+            <Check size={13} strokeWidth={2.5} /> Resolve
+          </button>
         )}
-      </button>
+      </div>
 
       {expanded && (
         <div className={styles.thread}>

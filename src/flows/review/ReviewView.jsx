@@ -18,11 +18,13 @@ export default function ReviewView() {
     finishApproveFile,
     addReviewNote,
     addReply,
+    resolveNote,
   } = useStore()
   const [selectedFile, setSelectedFile] = useState(files[0].id)
   const [selectedVersion, setSelectedVersion] = useState('current')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [composer, setComposer] = useState(null) // 'comment' | 'request' | null
+  const [triedApprove, setTriedApprove] = useState(false)
 
   const file = files.find((f) => f.id === selectedFile)
   const notes = notesByFile[selectedFile]
@@ -30,17 +32,32 @@ export default function ReviewView() {
   const fileApproved = fileStatus === 'approved'
   const versionInfo = file.versions.find((v) => v.id === selectedVersion)
 
+  const unresolvedIssues = notes.filter(
+    (n) => n.tag === 'Needs Attention' && n.status === 'open'
+  ).length
+
   const meta = {
     resolvedCount: notes.filter((n) => n.status === 'resolved').length,
-    needsAttention: notes.filter(
-      (n) => n.tag === 'Needs Attention' && n.status === 'open'
-    ).length,
+    needsAttention: unresolvedIssues,
     collaborators: 3,
   }
+
+  // Show the error only after a blocked approve attempt, and auto-clear once resolved.
+  const approveError = triedApprove && unresolvedIssues > 0 ? unresolvedIssues : 0
 
   function selectFile(id) {
     setSelectedFile(id)
     setSelectedVersion('current') // always land on the live version
+    setTriedApprove(false)
+  }
+
+  function handleApproveClick() {
+    if (unresolvedIssues > 0) {
+      setTriedApprove(true) // block + surface the error
+      return
+    }
+    setTriedApprove(false)
+    setDialogOpen(true)
   }
 
   function confirmApprove() {
@@ -67,7 +84,8 @@ export default function ReviewView() {
         meta={meta}
         status={fileStatus}
         fileName={file.name}
-        onApprove={() => setDialogOpen(true)}
+        approveError={approveError}
+        onApprove={handleApproveClick}
         onRequestChange={() => setComposer('request')}
         onComment={() => setComposer('comment')}
       />
@@ -76,6 +94,7 @@ export default function ReviewView() {
         users={users}
         currentUser={currentUser}
         onAddReply={(noteId, payload) => addReply(selectedFile, noteId, payload)}
+        onResolve={(noteId) => resolveNote(selectedFile, noteId)}
         approved={fileApproved}
       />
 
