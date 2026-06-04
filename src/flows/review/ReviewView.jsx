@@ -9,8 +9,17 @@ import ReviewComposer from './ReviewComposer'
 import styles from './ReviewView.module.css'
 
 export default function ReviewView() {
-  const { users, reviewNotes, reviewMeta, approval, approveDesign, finishApproval, addReviewNote } =
-    useStore()
+  const {
+    users,
+    currentUser,
+    reviewNotes,
+    reviewMeta,
+    approval,
+    approveDesign,
+    finishApproval,
+    addReviewNote,
+    addReply,
+  } = useStore()
   const [selectedFile, setSelectedFile] = useState(files[0].id)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [composer, setComposer] = useState(null) // 'comment' | 'request' | null
@@ -40,7 +49,13 @@ export default function ReviewView() {
         onRequestChange={() => setComposer('request')}
         onComment={() => setComposer('comment')}
       />
-      <ReviewDetails notes={reviewNotes} users={users} approved={approved} />
+      <ReviewDetails
+        notes={reviewNotes}
+        users={users}
+        currentUser={currentUser}
+        onAddReply={addReply}
+        approved={approved}
+      />
 
       <ApproveDialog
         open={dialogOpen}

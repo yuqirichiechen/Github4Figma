@@ -2,7 +2,13 @@ import { SlidersHorizontal, ChevronRight, CheckCircle2 } from 'lucide-react'
 import IntentNoteCard from './IntentNoteCard'
 import styles from './ReviewDetails.module.css'
 
-export default function ReviewDetails({ notes, users, approved = false }) {
+export default function ReviewDetails({
+  notes,
+  users,
+  currentUser,
+  onAddReply,
+  approved = false,
+}) {
   return (
     <aside className={styles.panel}>
       <header className={styles.header}>
@@ -26,7 +32,15 @@ export default function ReviewDetails({ notes, users, approved = false }) {
 
       <div className={styles.notes}>
         {notes.map((n) => (
-          <IntentNoteCard key={n.id} note={n} author={users[n.authorId]} />
+          <IntentNoteCard
+            key={n.id}
+            note={n}
+            author={users[n.authorId]}
+            users={users}
+            currentUser={currentUser}
+            onAddReply={onAddReply}
+            approved={approved}
+          />
         ))}
       </div>
     </aside>

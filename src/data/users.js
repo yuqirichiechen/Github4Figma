@@ -6,3 +6,9 @@ export const users = {
 }
 
 export const collaborators = [users.richie, users.noga, users.jordan]
+
+// The two swappable accounts for the demo, each with its home screen.
+export const accounts = [
+  { id: 'richie', role: 'Designer', home: '/changes' },
+  { id: 'noga', role: 'Reviewer', home: '/review' },
+]

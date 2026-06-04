@@ -1,13 +1,28 @@
-import { NavLink } from 'react-router-dom'
-import { GitBranch, Share2, ChevronRight } from 'lucide-react'
-import { AvatarStack } from '../components/Avatar'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { GitBranch, Share2, ChevronRight, PenLine, MessagesSquare } from 'lucide-react'
 import Button from '../components/Button'
-import { collaborators } from '../data/users'
+import { useStore } from '../store/AppStore'
+import AccountSwitcher from './AccountSwitcher'
 import styles from './TopBar.module.css'
 
 const crumbs = ['GitHub for Figma', 'Mobile App Redesign', 'Review Session']
 
 export default function TopBar() {
+  const navigate = useNavigate()
+  const { accounts, users, currentUserId, switchUser, reviewNotes, approval } = useStore()
+
+  const current = accounts.find((a) => a.id === currentUserId)
+  const other = accounts.find((a) => a.id !== currentUserId)
+
+  const openCount = reviewNotes.filter((n) => n.status === 'open').length
+  const showBadge = approval !== 'approved' && openCount > 0
+
+  function handleSwitch(id) {
+    switchUser(id)
+    const acc = accounts.find((a) => a.id === id)
+    if (acc) navigate(acc.home)
+  }
+
   return (
     <header className={styles.bar}>
       <div className={styles.left}>
@@ -29,24 +44,28 @@ export default function TopBar() {
       <nav className={styles.tabs} aria-label="Flows">
         <NavLink
           to="/changes"
-          className={({ isActive }) =>
-            `${styles.tab} ${isActive ? styles.tabActive : ''}`
-          }
+          className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
         >
+          <PenLine size={15} strokeWidth={2.5} />
           Changes
         </NavLink>
         <NavLink
           to="/review"
-          className={({ isActive }) =>
-            `${styles.tab} ${isActive ? styles.tabActive : ''}`
-          }
+          className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
         >
+          <MessagesSquare size={15} strokeWidth={2.5} />
           Review
+          {showBadge && <span className={styles.count}>{openCount}</span>}
         </NavLink>
       </nav>
 
       <div className={styles.right}>
-        <AvatarStack users={collaborators} size={26} />
+        <AccountSwitcher
+          current={current}
+          other={other}
+          users={users}
+          onSwitch={handleSwitch}
+        />
         <Button variant="ghost" size="sm" icon={Share2}>
           Share
         </Button>
