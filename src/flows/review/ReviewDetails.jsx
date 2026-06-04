@@ -9,6 +9,8 @@ export default function ReviewDetails({
   onAddReply,
   onResolve,
   approved = false,
+  readOnly = false,
+  versionLabel,
 }) {
   return (
     <aside className={styles.panel}>
@@ -20,9 +22,9 @@ export default function ReviewDetails({
       </header>
 
       <div className={styles.sortRow}>
-        {approved ? (
+        {readOnly ? (
           <span className={styles.approvedTag}>
-            <CheckCircle2 size={13} strokeWidth={2.5} /> Approved
+            <CheckCircle2 size={13} strokeWidth={2.5} /> {versionLabel} · approved
           </span>
         ) : (
           <button className={styles.sort}>
@@ -32,18 +34,23 @@ export default function ReviewDetails({
       </div>
 
       <div className={styles.notes}>
-        {notes.map((n) => (
-          <IntentNoteCard
-            key={n.id}
-            note={n}
-            author={users[n.authorId]}
-            users={users}
-            currentUser={currentUser}
-            onAddReply={onAddReply}
-            onResolve={onResolve}
-            approved={approved}
-          />
-        ))}
+        {notes.length === 0 ? (
+          <p className={styles.empty}>No comments on this version.</p>
+        ) : (
+          notes.map((n) => (
+            <IntentNoteCard
+              key={n.id}
+              note={n}
+              author={users[n.authorId]}
+              users={users}
+              currentUser={currentUser}
+              onAddReply={onAddReply}
+              onResolve={onResolve}
+              approved={approved}
+              readOnly={readOnly}
+            />
+          ))
+        )}
       </div>
     </aside>
   )

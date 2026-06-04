@@ -69,6 +69,38 @@
   padding-left: 22px;
 }
 
+.voiceWrap {
+  margin-left: 22px;
+}
+
+/* ---- AI summary block ---- */
+.aiSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-left: 22px;
+  padding: 10px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-md);
+}
+.aiLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--indigo-700);
+}
+.aiText {
+  margin: 0;
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+  color: var(--text);
+}
+
 /* ---- card actions (reply + resolve) ---- */
 .cardActions {
   display: flex;

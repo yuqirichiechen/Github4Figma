@@ -27,17 +27,23 @@ export default function ReviewView() {
   const [triedApprove, setTriedApprove] = useState(false)
 
   const file = files.find((f) => f.id === selectedFile)
-  const notes = notesByFile[selectedFile]
   const fileStatus = fileApproval[selectedFile] // 'reviewing' | 'submitting' | 'approved'
   const fileApproved = fileStatus === 'approved'
   const versionInfo = file.versions.find((v) => v.id === selectedVersion)
+  const viewingPast = selectedVersion !== 'current'
 
-  const unresolvedIssues = notes.filter(
+  // Live (Current) notes drive approval/meta; the panel shows the selected version.
+  const currentNotes = notesByFile[selectedFile]
+  const displayedNotes = viewingPast
+    ? file.notesByVersion[selectedVersion]
+    : currentNotes
+
+  const unresolvedIssues = currentNotes.filter(
     (n) => n.tag === 'Needs Attention' && n.status === 'open'
   ).length
 
   const meta = {
-    resolvedCount: notes.filter((n) => n.status === 'resolved').length,
+    resolvedCount: currentNotes.filter((n) => n.status === 'resolved').length,
     needsAttention: unresolvedIssues,
     collaborators: 3,
   }
@@ -90,12 +96,14 @@ export default function ReviewView() {
         onComment={() => setComposer('comment')}
       />
       <ReviewDetails
-        notes={notes}
+        notes={displayedNotes}
         users={users}
         currentUser={currentUser}
         onAddReply={(noteId, payload) => addReply(selectedFile, noteId, payload)}
         onResolve={(noteId) => resolveNote(selectedFile, noteId)}
-        approved={fileApproved}
+        approved={!viewingPast && fileApproved}
+        readOnly={viewingPast}
+        versionLabel={versionInfo.label}
       />
 
       <ApproveDialog

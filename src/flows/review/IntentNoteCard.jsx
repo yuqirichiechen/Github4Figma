@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Circle, CheckCircle2, MessageSquare, ChevronDown, ChevronUp, Send, Check } from 'lucide-react'
+import { Circle, CheckCircle2, MessageSquare, ChevronDown, ChevronUp, Send, Check, Sparkles } from 'lucide-react'
 import Badge from '../../components/Badge'
 import Avatar from '../../components/Avatar'
 import Button from '../../components/Button'
+import VoiceClip from '../../components/VoiceClip'
 import styles from './IntentNoteCard.module.css'
 
 const TAG_TONE = {
@@ -18,10 +19,12 @@ export default function IntentNoteCard({
   onAddReply,
   onResolve,
   approved = false,
+  readOnly = false,
 }) {
   const resolved = note.status === 'resolved'
   const isNew = !resolved && note.time === 'just now'
   const replies = note.replies ?? []
+  const locked = readOnly || approved
 
   const [expanded, setExpanded] = useState(false)
   const [replyText, setReplyText] = useState('')
@@ -58,7 +61,22 @@ export default function IntentNoteCard({
         )}
       </header>
 
-      <p className={styles.text}>{note.text}</p>
+      {note.voice && (
+        <div className={styles.voiceWrap}>
+          <VoiceClip durationSec={note.voice.durationSec} />
+        </div>
+      )}
+
+      {note.aiSummary && (
+        <div className={styles.aiSummary}>
+          <span className={styles.aiLabel}>
+            <Sparkles size={12} strokeWidth={2.5} /> AI Summary
+          </span>
+          <p className={styles.aiText}>{note.aiSummary}</p>
+        </div>
+      )}
+
+      {note.text && <p className={styles.text}>{note.text}</p>}
 
       <div className={styles.cardActions}>
         <button
@@ -75,7 +93,7 @@ export default function IntentNoteCard({
           )}
         </button>
 
-        {!resolved && (
+        {!resolved && !locked && (
           <button className={styles.resolveBtn} onClick={() => onResolve(note.id)}>
             <Check size={13} strokeWidth={2.5} /> Resolve
           </button>
@@ -100,7 +118,7 @@ export default function IntentNoteCard({
             )
           })}
 
-          {!approved && (
+          {!locked && (
             <div className={styles.replyForm}>
               <Avatar user={currentUser} size={22} />
               <input

@@ -10,8 +10,11 @@ const initialFileApproval = Object.fromEntries(
   files.map((f) => [f.id, 'reviewing']) // 'reviewing' | 'submitting' | 'approved'
 )
 
-// Notes live per file: { [fileId]: [note, ...] }.
-const initialNotesByFile = Object.fromEntries(files.map((f) => [f.id, f.notes]))
+// Live (Current-version) notes per file: { [fileId]: [note, ...] }.
+// Historical versions (v1–v3) are static and read straight from files data.
+const initialNotesByFile = Object.fromEntries(
+  files.map((f) => [f.id, f.notesByVersion.current])
+)
 
 export function AppProvider({ children }) {
   const [changes, setChanges] = useState(seedChanges)

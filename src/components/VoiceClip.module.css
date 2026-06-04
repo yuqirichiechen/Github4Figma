@@ -1,0 +1,37 @@
+.clip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  background: var(--indigo-100);
+  border-radius: var(--radius-md);
+}
+
+.play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--indigo-500);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.play:hover {
+  background: var(--indigo-700);
+}
+.play:active {
+  transform: scale(0.95);
+}
+
+.dur {
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--indigo-700);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
